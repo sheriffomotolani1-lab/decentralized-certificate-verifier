@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+solidity ^0.8.20;
 
 contract CertificateVerifier {
     struct Certificate {
@@ -10,7 +10,7 @@ contract CertificateVerifier {
         bool exists;
     }
 
-    // Hash of Certificate ID -> Certificate details
+    // Mapping from Certificate ID/Hash to Certificate details
     mapping(bytes32 => Certificate) public certificates;
     
     // Contract owner (Issuer)
@@ -18,9 +18,10 @@ contract CertificateVerifier {
 
     // Events
     event CertificateIssued(bytes32 indexed certId, string studentName, string courseName);
+    event CertificateRevoked(bytes32 indexed certId);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not authorized: Only owner can perform this action");
+        require(msg.sender == owner, "Not authorized: Only owner can call this");
         _;
     }
 
@@ -48,7 +49,7 @@ contract CertificateVerifier {
         emit CertificateIssued(certId, studentName, courseName);
     }
 
-    /// @notice Verify a certificate and return details
+    /// @notice Verify if a certificate is valid and return its details
     function verifyCertificate(bytes32 certId) external view returns (
         bool isValid,
         string memory studentName,

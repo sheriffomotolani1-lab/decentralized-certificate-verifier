@@ -3,83 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate Verifier Portal</title>
-    <!-- Load Ethers.js v6 -->
+    <title>Decentralized Certificate Verifier</title>
+    <!-- Ethers.js v6 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 20px; margin: 0; }
-        .card { max-width: 500px; margin: 40px auto; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-        h2 { color: #58a6ff; text-align: center; margin-bottom: 8px; }
-        p.subtitle { text-align: center; color: #8b949e; font-size: 14px; margin-bottom: 24px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        input { width: 100%; padding: 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #fff; box-sizing: border-box; margin-bottom: 16px; }
-        button { width: 100%; padding: 12px; background: #238636; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #2ea043; }
-        #result { margin-top: 20px; padding: 16px; border-radius: 8px; display: none; }
-        .success { background: rgba(46, 160, 67, 0.15); border: 1px solid #2ea043; color: #3fb950; }
-        .error { background: rgba(248, 81, 73, 0.15); border: 1px solid #f85149; color: #f85149; }
-    </style>
-</head>
-<body>
-
-<div class="card">
-    <h2>Certificate Verifier</h2>
-    <p class="subtitle">Ethereum Sepolia On-Chain Verification</p>
-
-    <label for="certId">Certificate ID (bytes32):</label>
-    <input type="text" id="certId" placeholder="0x1111111111111111111111111111111111111111111111111111111111111111">
-    
-    <button onclick="verifyCertificate()">Verify On-Chain</button>
-
-    <div id="result"></div>
-</div>
-
-<script>
-    const contractAddress = "0x46F7c07939e7b7B820D97d8f247f2d30A21899AC";
-    const contractABI = [
-        "function verifyCertificate(bytes32 certId) external view returns (bool isValid, string memory studentName, string memory courseName, string memory grade, uint256 issueDate)"
-    ];
-
-    async function verifyCertificate() {
-        const certId = document.getElementById("certId").value.trim();
-        const resultDiv = document.getElementById("result");
-        
-        if (!certId) {
-            alert("Please enter a Certificate ID.");
-            return;
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --accent-color: #238636;
+            --accent-hover: #2ea043;
+            --text-color: #c9d1d9;
+            --heading-color: #58a6ff;
+            --error-color: #f85149;
         }
 
-        resultDiv.style.display = "block";
-        resultDiv.className = "";
-        resultDiv.innerHTML = "⏳ Querying Sepolia Blockchain...";
-
-        try {
-            // Sepolia RPC provider
-            const provider = new ethers.JsonRpcProvider("https://rpc.sepolia.org");
-            const contract = new ethers.Contract(contractAddress, contractABI, provider);
-
-            const data = await contract.verifyCertificate(certId);
-            const formattedDate = new Date(Number(data.issueDate) * 1000).toLocaleDateString();
-
-            resultDiv.className = "success";
-            resultDiv.innerHTML = `
-                <h3 style="margin-top:0;">✅ Valid Certificate</h3>
-                <p><strong>Student:</strong> ${data.studentName}</p>
-                <p><strong>Course:</strong> ${data.courseName}</p>
-                <p><strong>Grade:</strong> ${data.grade}</p>
-                <p><strong>Issued Date:</strong> ${formattedDate}</p>
-            `;
-        } catch (err) {
-            console.error(err);
-            resultDiv.className = "error";
-            resultDiv.innerHTML = `
-                <h3 style="margin-top:0;">❌ Certificate Not Found</h3>
-                <p style="font-size:13px; margin-bottom:0;">This Certificate ID does not exist on-chain or is invalid.</p>
-            `;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-    }
-</script>
 
-</body>
-                                                                                          </html>
-  
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            color: var(--heading-color);
+            font-size: 1.6rem;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            font-size: 0.9rem;
+            color: #8b949e;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--heading-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .result-box {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .result-box.success {
+            background-color: rgba(35, 134, 54, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .result-box.error {
+            background-color: rgba(248, 81, 73, 0.15);
+            border-color: var(--error-color);
+            color: var(--error-color);
+            text-align: center;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #8b949e;
+        }
+
+        .result-value {
+            color: #ffffff;
+        }
+
+        .loader {
+            
